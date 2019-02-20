@@ -3,6 +3,10 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const app = express();
 const mongoose = require('mongoose');
+const expressValidator = require('express-validator');
+const flash = require('connect-flash');
+const session = require('express-session');
+
 mongoose.connect('mongodb://localhost/nodekb');
 let db = mongoose.connection;
 //body-parser Middleware 
@@ -32,8 +36,29 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 //set public folder
-
 app.use(express.static(path.join(__dirname, 'public')));
+
+//express Session middleware
+app.use(session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: true
+
+}));
+
+//express message middleware
+app.use(require('connect-flash')());
+app.use(function (req, res, next) {
+    res.locals.messages = require('express-messages')(req, res);
+    next();
+});
+
+
+//express validator middleware
+app.use(expressValidator());
+
+
+
 //home route
 app.get('/', (req, res) => {
     article.find({}, (err, articles) => {
@@ -45,44 +70,13 @@ app.get('/', (req, res) => {
                 articles: articles
             });
         }
-
     })
-
-});
-app.get('/article/:id', (req, res) => {
-    article.findById(req.params.id, (err, data) => {
-        res.render('article', {
-            data: data
-        });
-
-    });
-})
-
-//add Route 
-app.get('/articles/add', (req, res) => {
-    res.render('add', {
-        title: 'Add articles'
-    });
 });
 
+//Route files
 
-//add submit POST Route
-
-app.post('/articles/add', (req, res) => {
-    let arti = new article();
-    arti.title = req.body.title;
-    arti.author = req.body.author;
-    arti.body = req.body.body;
-
-    arti.save((err) => {
-        if (err) {
-            console.log(err);
-            return;
-        } else {
-            res.redirect('/');
-        }
-    })
-})
+let articless = require('./routes/articles.js');
+app.use('/articles', articless)
 
 //start server
 app.listen(5500, () => {

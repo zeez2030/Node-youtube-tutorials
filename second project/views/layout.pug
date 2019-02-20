@@ -4,37 +4,44 @@ html(lang="en")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         meta(http-equiv="X-UA-Compatible", content="ie=edge")
         title Node
-        link(rel="stylesheet", href="/bower_components/bootstrap/dist/css/bootstrap.css")
+        link(href="/bower_components/bootstrap/dist/css/bootstrap.css", rel="stylesheet")
+        link(href="/css/styles.css", rel="stylesheet")
     body
         nav.navbar.navbar-expand-md.navbar-dark.bg-dark.mb-5
             a.navbar-brand(href='/') KnowledgeBase
-            button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarsExampleDefault', aria-controls='navbarsExampleDefault', aria-expanded='false', aria-label='Toggle navigation')
+            button.navbar-toggler(data-target='#navbarsExampleDefault', data-toggle='collapse', type='button', aria-controls='navbarsExampleDefault', aria-expanded='false', aria-label='Toggle navigation')
                 span.navbar-toggler-icon
             #navbarsExampleDefault.collapse.navbar-collapse
                 ul.navbar-nav.mr-auto
                     li.nav-item.active
                         a.nav-link(href='/')
-                    
+
                             span.sr-only (current)
                     li.nav-item
                         a.nav-link(href='/') Home
                     li.nav-item
                         a.nav-link(href='/articles/add') Add Article
                     li.nav-item.dropdown
-                        a#dropdown01.nav-link.dropdown-toggle(href='#', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false') Dropdown
+                        a#dropdown01.nav-link.dropdown-toggle(data-toggle='dropdown', href='#', aria-expanded='false', aria-haspopup='true') Dropdown
                         .dropdown-menu(aria-labelledby='dropdown01')
                             a.dropdown-item(href='#') Action
                             a.dropdown-item(href='#') Another action
                             a.dropdown-item(href='#') Something else here
                 form.form-inline.my-2.my-lg-0
-                    input.form-control.mr-sm-2(type='text', placeholder='Search', aria-label='Search')
+                    input.form-control.mr-sm-2(type='text', aria-label='Search', placeholder='Search')
                     button.btn.btn-secondary.my-2.my-sm-0(type='submit') Search
-        
+
         .container.mt-5
+            != messages('message',locals)
+            if errors
+                each error, i in errors
+                    div.alert.alert-danger #{error.msg}
             block content
             br
             hr
             footer  
                 p   Copyright &copy; 2017
-        script(src='https://code.jquery.com/jquery-3.3.1.slim.min.js', integrity='sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo', crossorigin='anonymous')        
+
+        script(src='https://code.jquery.com/jquery-3.3.1.min.js', integrity='sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=', crossorigin='anonymous')
         script(src="/bower_components/bootstrap/dist/js/bootstrap.bundle.js")
+        script(src="/js/main.js")
