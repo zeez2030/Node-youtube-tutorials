@@ -7,9 +7,10 @@ block content
             .form-group
                 label Title:
                 input.form-control(name="title",type='text',value=data.title)
-            .form-group
-                label Author:
-                input.form-control(name="author",type='text',value=data.author)
+            if !user
+                .form-group
+                    label Author:
+                    input.form-control-plaintext.p-3(name="author",type='text',value=user)
             .form-group
                 label Body:
                 textarea.form-control(name="body")=data.body

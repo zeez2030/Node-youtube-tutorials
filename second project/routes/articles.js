@@ -4,6 +4,7 @@ const router = express.Router();
 
 //bring in the models
 let article = require('../models/article');
+let User = require('../models/user');
 
 
 
@@ -11,18 +12,30 @@ let article = require('../models/article');
 
 
 //Load edit form
-router.get('/edit/:id', (req, res) => {
+router.get('/edit/:id', ensureAuthenticated, (req, res) => {
     article.findById(req.params.id, (err, data) => {
-        res.render('edit_article', {
-            title: 'Edit page',
-            data: data
-        });
+        if (data.author != req.user._id) {
+            req.flash('danger', 'not Authorized');
+            res.redirect('/');
+            return
+        }
+        User.findById(data.author, (err, user) => {
+            if (err) throw error;
+            else {
+                res.render('edit_article', {
+                    title: 'Edit page',
+                    data: data,
+                    user: user.name
+                });
+
+            }
+        })
 
     });
 })
 
 //add Route 
-router.get('/add', (req, res) => {
+router.get('/add', ensureAuthenticated, (req, res) => {
     res.render('add', {
         title: 'Add articles'
     });
@@ -33,7 +46,7 @@ router.get('/add', (req, res) => {
 
 router.post('/add', (req, res) => {
     req.checkBody('title', 'Title is required').notEmpty();
-    req.checkBody('author', 'Author is required').notEmpty();
+
     req.checkBody('body', 'Body is required').notEmpty();
 
 
@@ -49,7 +62,7 @@ router.post('/add', (req, res) => {
     } else {
         let arti = new article();
         arti.title = req.body.title;
-        arti.author = req.body.author;
+        arti.author = req.user._id;
         arti.body = req.body.body;
 
         arti.save((err) => {
@@ -71,7 +84,7 @@ router.post('/add', (req, res) => {
 router.post('/edit/:id', (req, res) => {
     let arti = {};
     arti.title = req.body.title;
-    arti.author = req.body.author;
+    arti.author = req.user._id;
     arti.body = req.body.body;
     let query = {
         _id: req.params.id
@@ -90,22 +103,51 @@ router.post('/edit/:id', (req, res) => {
 //Get Single Article
 router.get('/:id', (req, res) => {
     article.findById(req.params.id, (err, data) => {
-        res.render('article', {
-            data: data
-        });
+        User.findById(data.author, (err, user) => {
+            if (err) throw err;
+            res.render('article', {
+                data: data,
+                author: user.name
+            });
+        })
+
 
     });
 })
 //Delete Article
 router.delete('/:id', (req, res) => {
+    if (!req.user) {
+        res.status(500).send();
+    }
+
     let query = {
         _id: req.params.id
     }
-    article.remove(query, (err) => {
-        if (err) {
-            console.log(err);
+    article.findById(req.params.id, (err, a) => {
+        if (a.author != req.user._id) {
+            res.status(500).send();
+        } else {
+            article.remove(query, (err) => {
+                if (err) {
+                    console.log(err);
+                }
+                res.send('Success');
+            })
         }
-        res.send('Success');
     })
+
+
 })
+
+
+//access Control
+
+function ensureAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    } else {
+        req.flash('danger', 'Please login');
+        res.redirect('/users/login');
+    }
+}
 module.exports = router;

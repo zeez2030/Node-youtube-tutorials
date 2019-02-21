@@ -7,7 +7,7 @@ html(lang="en")
         link(href="/bower_components/bootstrap/dist/css/bootstrap.css", rel="stylesheet")
         link(href="/css/styles.css", rel="stylesheet")
     body
-        nav.navbar.navbar-expand-md.navbar-dark.bg-dark.mb-5
+        nav.p-3.navbar.navbar-expand-md.navbar-dark.bg-dark.mb-5
             a.navbar-brand(href='/') KnowledgeBase
             button.navbar-toggler(data-target='#navbarsExampleDefault', data-toggle='collapse', type='button', aria-controls='navbarsExampleDefault', aria-expanded='false', aria-label='Toggle navigation')
                 span.navbar-toggler-icon
@@ -19,17 +19,20 @@ html(lang="en")
                             span.sr-only (current)
                     li.nav-item
                         a.nav-link(href='/') Home
-                    li.nav-item
-                        a.nav-link(href='/articles/add') Add Article
-                    li.nav-item.dropdown
-                        a#dropdown01.nav-link.dropdown-toggle(data-toggle='dropdown', href='#', aria-expanded='false', aria-haspopup='true') Dropdown
-                        .dropdown-menu(aria-labelledby='dropdown01')
-                            a.dropdown-item(href='#') Action
-                            a.dropdown-item(href='#') Another action
-                            a.dropdown-item(href='#') Something else here
-                form.form-inline.my-2.my-lg-0
-                    input.form-control.mr-sm-2(type='text', aria-label='Search', placeholder='Search')
-                    button.btn.btn-secondary.my-2.my-sm-0(type='submit') Search
+                    if user
+                        li.nav-item
+                            a.nav-link(href='/articles/add') Add Article
+                ul.nav.navbar-nav.navbar-right
+                    
+                    if user
+                        li 
+                            a.btn.btn-primary(href="/users/logout") logout
+                    else
+
+                        li
+                            a.btn.btn-primary(href="/users/register") Register
+                        li
+                            a.ml-4.btn.btn-primary(href="/users/login") Login
 
         .container.mt-5
             != messages('message',locals)
